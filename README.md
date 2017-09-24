@@ -1,5 +1,8 @@
 # Spring Boot Recipe Application
 
+[![CircleCI](https://circleci.com/gh/olegbezk/spring5-recipe-app.svg?style=svg)]
+(https://circleci.com/gh/olegbezk/spring5-recipe-app)
+
 ## Embedded database url:
 
 [Database console](http://localhost:8080/h2-console)
