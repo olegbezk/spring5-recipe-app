@@ -8,9 +8,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -27,6 +29,23 @@ public class RecipeServiceImplTest {
         MockitoAnnotations.initMocks(this);
 
         recipeService = new RecipeServiceImpl(recipeRepository);
+    }
+
+    @Test
+    public void getRecipeById() throws Exception {
+        Recipe recipe = new Recipe();
+        recipe.setId(1L);
+        final Optional<Recipe> recipeOptional = Optional.of(recipe);
+
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        final Recipe recipeById = recipeService.getRecipeById(1L);
+
+        assertEquals(recipeById, recipe);
+
+        verify(recipeRepository).findById(anyLong());
+
+        verifyNoMoreInteractions(recipeRepository);
     }
 
     @Test
