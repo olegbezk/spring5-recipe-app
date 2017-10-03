@@ -40,7 +40,7 @@ public class RecipeControllerTest {
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
 
-        when(recipeService.getRecipeById(anyLong())).thenReturn(recipe);
+        when(recipeService.findById(anyLong())).thenReturn(recipe);
 
         mockMvc.perform(get("/recipe/show/1"))
                 .andExpect(status().isOk())
