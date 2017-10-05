@@ -5,6 +5,7 @@ import guru.springframework.converters.RecipeCommandToRecipe;
 import guru.springframework.converters.RecipeToRecipeCommand;
 import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.RecipeRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,8 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -44,6 +45,11 @@ public class RecipeServiceImplTest {
         recipeService = new RecipeServiceImpl(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        verifyNoMoreInteractions(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
+    }
+
     @Test
     public void getRecipeById() throws Exception {
         Recipe recipe = new Recipe();
@@ -57,8 +63,6 @@ public class RecipeServiceImplTest {
         assertEquals(recipeById, recipe);
 
         verify(recipeRepository).findById(anyLong());
-
-        verifyNoMoreInteractions(recipeRepository);
     }
 
     @Test
@@ -74,8 +78,6 @@ public class RecipeServiceImplTest {
         assertEquals(recipes.size(), 1);
 
         verify(recipeRepository).findAll();
-
-        verifyNoMoreInteractions(recipeRepository);
     }
 
     @Test
@@ -94,7 +96,23 @@ public class RecipeServiceImplTest {
         RecipeCommand commandById = recipeService.findCommandById(1L);
 
         assertNotNull("Null recipe returned", commandById);
-        verify(recipeRepository, times(1)).findById(anyLong());
+        verify(recipeRepository).findById(eq(1L));
+        verify(recipeToRecipeCommand).convert(eq(recipe));
         verify(recipeRepository, never()).findAll();
+    }
+
+    @Test
+    public void testDeleteById() throws Exception {
+
+        //given
+        Long idToDelete = 2L;
+
+        //when
+        recipeService.deleteById(idToDelete);
+
+        //no 'when', since method has void return type
+
+        //then
+        verify(recipeRepository).deleteById(eq(2L));
     }
 }
