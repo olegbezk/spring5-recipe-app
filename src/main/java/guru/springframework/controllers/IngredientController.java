@@ -1,5 +1,6 @@
 package guru.springframework.controllers;
 
+import guru.springframework.services.IngredientService;
 import guru.springframework.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,12 @@ public class IngredientController {
 
     private final RecipeService recipeService;
 
+    private final IngredientService ingredientService;
+
     @Autowired
-    public IngredientController(final RecipeService recipeService) {
+    public IngredientController(final RecipeService recipeService, final IngredientService ingredientService) {
         this.recipeService = recipeService;
+        this.ingredientService = ingredientService;
     }
 
     @GetMapping
@@ -29,5 +33,12 @@ public class IngredientController {
         model.addAttribute("recipe", recipeService.findCommandById(id));
 
         return "recipe/ingredient/list";
+    }
+
+    @GetMapping
+    @RequestMapping("/{recipeId}/ingredient/{ingredientId}/show")
+    public String showRecipeIngredient(@PathVariable Long recipeId, @PathVariable Long ingredientId, Model model) {
+        model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
+        return "recipe/ingredient/show";
     }
 }
