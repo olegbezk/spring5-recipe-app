@@ -18,6 +18,7 @@ import java.util.HashSet;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -150,5 +151,15 @@ public class IngredientControllerTest {
                 .andExpect(view().name("redirect:/recipe/2/ingredient/3/show"));
 
         verify(ingredientService).saveIngredientCommand(any());
+    }
+
+    @Test
+    public void deleteIngredient() throws Exception {
+        mockMvc.perform(get("/recipe/2/ingredient/3/delete")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/recipe/2/ingredients"));
+
+        verify(ingredientService).deleteById(eq(2L), eq(3L));
     }
 }
