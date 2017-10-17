@@ -4,6 +4,7 @@ import guru.springframework.commands.RecipeCommand;
 import guru.springframework.converters.RecipeCommandToRecipe;
 import guru.springframework.converters.RecipeToRecipeCommand;
 import guru.springframework.domain.Recipe;
+import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.repositories.RecipeRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -45,11 +47,6 @@ public class RecipeServiceImplTest {
         recipeService = new RecipeServiceImpl(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        verifyNoMoreInteractions(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
-    }
-
     @Test
     public void getRecipeById() throws Exception {
         Recipe recipe = new Recipe();
@@ -62,7 +59,22 @@ public class RecipeServiceImplTest {
 
         assertEquals(recipeById, recipe);
 
-        verify(recipeRepository).findById(anyLong());
+        verify(recipeRepository).findById(eq(1L));
+
+        verifyNoMoreInteractions(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void getRecipeById_NotFound() throws Exception {
+        Optional<Recipe> recipeOptional = Optional.empty();
+
+        when(recipeRepository.findById(eq(1L))).thenReturn(recipeOptional);
+
+        final Recipe byId = recipeService.findById(1L);
+
+        assertNull(byId);
+
+        verify(recipeRepository).findById(eq(1L));
     }
 
     @Test
@@ -78,6 +90,8 @@ public class RecipeServiceImplTest {
         assertEquals(recipes.size(), 1);
 
         verify(recipeRepository).findAll();
+
+        verifyNoMoreInteractions(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 
     @Test
@@ -99,6 +113,8 @@ public class RecipeServiceImplTest {
         verify(recipeRepository).findById(eq(1L));
         verify(recipeToRecipeCommand).convert(eq(recipe));
         verify(recipeRepository, never()).findAll();
+
+        verifyNoMoreInteractions(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 
     @Test
@@ -114,5 +130,7 @@ public class RecipeServiceImplTest {
 
         //then
         verify(recipeRepository).deleteById(eq(2L));
+
+        verifyNoMoreInteractions(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 }
